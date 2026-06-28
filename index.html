@@ -151,7 +151,7 @@
       <span style="font-weight:700">Classificação geral</span>
       <button class="btn" id="refreshRank">🔄 Atualizar</button>
     </div>
-    <p class="hint">Pontos por fase: 16-avos = 1 · Oitavas = 2 · Quartas = 3 · Semis = 4 · Final = 5. O ranking atualiza conforme os resultados oficiais saem.</p>
+    <p class="hint">Pontos por fase: 16-avos = 1 · Oitavas = 2 · Quartas = 5 · Semis = 7 · Final = 10. Você pontua se acertar a seleção que se classifica em cada vaga (não importa o adversário). O ranking atualiza conforme os resultados oficiais saem.</p>
     <div id="rankWrap"><div class="empty-state">Carregando…</div></div>
   </section>
 
@@ -210,11 +210,11 @@ const ORDER = Object.keys(MATCHES);
 const ROUNDS = [
   {r:1,name:'16-avos de final',pts:1},
   {r:2,name:'Oitavas de final',pts:2},
-  {r:3,name:'Quartas de final',pts:3},
-  {r:4,name:'Semifinais',pts:4},
-  {r:5,name:'Final',pts:5}
+  {r:3,name:'Quartas de final',pts:5},
+  {r:4,name:'Semifinais',pts:7},
+  {r:5,name:'Final',pts:10}
 ];
-const PTS = {1:1,2:2,3:3,4:4,5:5};
+const PTS = {1:1,2:2,3:5,4:7,5:10};
 
 /* ---------- Helpers ---------- */
 function resolve(slot, picks){ return slot.team ? slot.team : (picks[slot.from] || null); }
