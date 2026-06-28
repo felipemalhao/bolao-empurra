@@ -121,6 +121,14 @@
   .ptchip.champ{background:linear-gradient(135deg,#f1c40f,#e67e22);color:#3b2f00}
   .ptchip.champ b{background:rgba(0,0,0,.18);color:#3b2f00}
   .ptarrow{color:#8fb9a1;font-weight:800;font-size:13px}
+  .rankname{cursor:pointer;color:var(--green);font-weight:700;text-decoration:underline dotted}
+  .rankname:hover{color:var(--green2)}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:flex-start;justify-content:center;z-index:100;padding:18px 8px;overflow:auto}
+  .modal.show{display:flex}
+  .modal-card{background:linear-gradient(160deg,#0e4429,#0a2e1b);border-radius:16px;max-width:1240px;width:100%;padding:14px;box-shadow:0 12px 44px rgba(0,0,0,.55)}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;color:#fff;font-weight:800;font-size:17px;margin-bottom:10px}
+  .modal-head button{background:rgba(255,255,255,.16);color:#fff;border:0;width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer}
+  .modal-head button:hover{background:rgba(255,255,255,.28)}
 </style>
 </head>
 <body>
@@ -175,6 +183,14 @@
     <div class="scrollwrap"><div id="bracket-resultados"></div></div>
   </section>
 </main>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <div class="modal-head"><span id="modalTitle">Palpite</span><button id="modalClose" title="Fechar">✕</button></div>
+    <div class="scrollwrap"><div id="modalBracket"></div></div>
+    <div class="receipt" style="margin-top:12px"><div class="rctitle">📋 Recibo</div><div id="modalReceipt"></div></div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -296,8 +312,8 @@ function renderBracket(containerId, picks, opts){
 }
 
 /* ---------- Recibo (lista) ---------- */
-function renderReceipt(picks){
-  const el=document.getElementById('receipt');
+function renderReceipt(picks, elId){
+  const el=document.getElementById(elId||'receipt');
   let h='';
   ROUNDS.forEach(R=>{
     const ids=ORDER.filter(id=>MATCHES[id].round===R.r);
@@ -312,7 +328,7 @@ function renderReceipt(picks){
 }
 
 /* ---------- Estado ---------- */
-let lockAt=null, isLocked=false, myPicks={}, myName='', results={};
+let lockAt=null, isLocked=false, myPicks={}, myName='', results={}, rankRows=[];
 
 function checkLock(){ isLocked = lockAt ? (Date.now() >= new Date(lockAt).getTime()) : false; }
 function fmtRemain(){
@@ -400,22 +416,30 @@ async function loadRanking(){
     db.from('bolao_predictions').select('name,picks'),
     db.from('bolao_state').select('results').eq('id',1).single()
   ]);
-  const res=(st&&st.results)||{};
+  const res=(st&&st.results)||{}; results=res;
   const decided=ORDER.filter(id=>res[id]);
   if(!preds||!preds.length){ wrap.innerHTML='<div class="empty-state">Ninguém preencheu o bolão ainda. Seja o primeiro! 😉</div>'; return; }
-  const rows=preds.map(p=>{
+  rankRows=preds.map(p=>{
     const pk=p.picks||{}; let pts=0,hits=0;
     decided.forEach(id=>{ if(pk[id]===res[id]){ pts+=PTS[MATCHES[id].round]; hits++; } });
-    return {name:p.name, pts, hits, champ:pk['r5_1']};
+    return {name:p.name, picks:pk, pts, hits, champ:pk['r5_1']};
   }).sort((a,b)=> b.pts-a.pts || b.hits-a.hits || a.name.localeCompare(b.name));
   let html=`<table><thead><tr><th class="rk">#</th><th>Nome</th><th style="text-align:center">Pontos</th><th style="text-align:center">Acertos</th><th>Campeão palpitado</th></tr></thead><tbody>`;
-  rows.forEach((r,i)=>{
+  rankRows.forEach((r,i)=>{
     const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
-    html+=`<tr><td class="rk">${medal}</td><td>${escapeHtml(r.name)}</td><td class="pt">${r.pts}</td><td style="text-align:center">${r.hits}</td><td>${r.champ?flagmini(r.champ)+T[r.champ].n:'<span style="color:#b7c2bb">—</span>'}</td></tr>`;
+    html+=`<tr><td class="rk">${medal}</td><td><span class="rankname" data-i="${i}">${escapeHtml(r.name)}</span></td><td class="pt">${r.pts}</td><td style="text-align:center">${r.hits}</td><td>${r.champ?flagmini(r.champ)+T[r.champ].n:'<span style="color:#b7c2bb">—</span>'}</td></tr>`;
   });
   html+='</tbody></table>';
-  html+=`<p class="hint">${decided.length} de ${ORDER.length} jogos com resultado lançado · ${rows.length} participante(s)</p>`;
+  html+=`<p class="hint">👆 Clique em um nome para ver o palpite completo · ${decided.length} de ${ORDER.length} jogos com resultado lançado · ${rankRows.length} participante(s)</p>`;
   wrap.innerHTML=html;
+  wrap.querySelectorAll('.rankname').forEach(s=>{ s.onclick=()=>openPalpite(rankRows[+s.dataset.i]); });
+}
+function openPalpite(row){
+  if(!row) return;
+  document.getElementById('modalTitle').textContent='Palpite de '+row.name;
+  renderBracket('modalBracket', row.picks||{}, {editable:false, results});
+  renderReceipt(row.picks||{}, 'modalReceipt');
+  document.getElementById('modal').classList.add('show');
 }
 function escapeHtml(s){ return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
@@ -432,6 +456,11 @@ document.querySelectorAll('nav button').forEach(b=>{
   };
 });
 document.getElementById('refreshRank').onclick=loadRanking;
+const modalEl=document.getElementById('modal');
+function closeModal(){ modalEl.classList.remove('show'); }
+document.getElementById('modalClose').onclick=closeModal;
+modalEl.onclick=e=>{ if(e.target===modalEl) closeModal(); };
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 
 /* ---------- Init ---------- */
 function buildLegend(){
