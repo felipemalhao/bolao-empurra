@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bolão da Copa 🏆</title>
+<title>Bolão Empurra 🏆</title>
 <style>
   :root{
     --green:#1a7a3c; --green2:#27ae60; --bg:#0b3d24;
@@ -133,7 +133,7 @@
 </head>
 <body>
 <header>
-  <h1>🏆 Bolão da Copa do Mundo</h1>
+  <h1>🏆 Bolão Empurra</h1>
   <div id="countdown">carregando…</div>
 </header>
 
@@ -199,6 +199,7 @@
 const SUPABASE_URL = 'https://eyfhdyairinbapjqolpn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZmhkeWFpcmluYmFwanFvbHBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MDgzNTYsImV4cCI6MjA5NDE4NDM1Nn0.QCfopuLL9piThz0YapJUwIVyZ9wPWx0gQnF4ReK9ZTg';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const POOL = 'empurra'; // identifica este bolão (dados isolados por pool)
 
 /* ---------- Seleções ---------- */
 const T = {
@@ -340,7 +341,7 @@ function fmtRemain(){
   cd.textContent=`⏳ Palpites travam em ${d>0?d+'d ':''}${h}h ${m}m ${s}s`; cd.className='';
 }
 async function loadState(){
-  const {data}=await db.from('bolao_state').select('*').eq('id',1).single();
+  const {data}=await db.from('bolao_state').select('*').eq('pool',POOL).single();
   if(data){ lockAt=data.lock_at; results=data.results||{}; }
   checkLock(); fmtRemain();
   if(lockAt) document.getElementById('lockInput').value=toLocalInput(lockAt);
@@ -352,14 +353,14 @@ function toLocalInput(iso){ const d=new Date(iso); const p=n=>String(n).padStart
 const nameInput=document.getElementById('playerName');
 const saveBtn=document.getElementById('saveBtn');
 function nameKey(n){ return n.trim().toLowerCase().replace(/\s+/g,' '); }
-function saveDraft(){ try{ localStorage.setItem('bolao_draft', JSON.stringify(myPicks)); }catch(e){} }
+function saveDraft(){ try{ localStorage.setItem(('bolao_draft_'+POOL), JSON.stringify(myPicks)); }catch(e){} }
 function refreshReceipt(){ renderReceipt(myPicks); saveDraft(); }
 
 document.getElementById('loadBtn').onclick=async()=>{
   const n=nameInput.value.trim();
   if(!n){ toast('Digite seu nome primeiro',true); return; }
   myName=n;
-  const {data}=await db.from('bolao_predictions').select('picks').eq('name_key',nameKey(n)).maybeSingle();
+  const {data}=await db.from('bolao_predictions').select('picks').eq('pool',POOL).eq('name_key',nameKey(n)).maybeSingle();
   if(data){ myPicks = data.picks||{}; }   // tem palpite salvo -> carrega; senao, mantem o que ja foi clicado
   normalize(myPicks);
   checkLock();
@@ -378,7 +379,7 @@ saveBtn.onclick=async()=>{
   if(!myName){ toast('Entre com seu nome primeiro',true); return; }
   saveBtn.disabled=true;
   const {error}=await db.from('bolao_predictions')
-    .upsert({name:myName, name_key:nameKey(myName), picks:myPicks}, {onConflict:'name_key'});
+    .upsert({pool:POOL, name:myName, name_key:nameKey(myName), picks:myPicks}, {onConflict:'pool,name_key'});
   if(error){
     if((error.message||'').includes('PALPITES_TRAVADOS')){ toast('🔒 Palpites já travaram!',true); checkLock(); fmtRemain(); }
     else toast('Erro ao salvar: '+error.message,true);
@@ -394,18 +395,18 @@ function renderResultados(){
   }});
 }
 async function saveResults(){
-  const {error}=await db.from('bolao_state').update({results, updated_at:new Date().toISOString()}).eq('id',1);
+  const {error}=await db.from('bolao_state').update({results, updated_at:new Date().toISOString()}).eq('pool',POOL);
   if(error) toast('Erro ao salvar resultado',true); else toast('Resultado salvo ✅');
 }
 document.getElementById('saveLock').onclick=async()=>{
   const v=document.getElementById('lockInput').value;
   if(!v){ toast('Escolha uma data/hora',true); return; }
   const iso=new Date(v).toISOString();
-  const {error}=await db.from('bolao_state').update({lock_at:iso}).eq('id',1);
+  const {error}=await db.from('bolao_state').update({lock_at:iso}).eq('pool',POOL);
   if(error) toast('Erro',true); else { lockAt=iso; checkLock(); fmtRemain(); toast('Horário de trava salvo'); }
 };
 document.getElementById('clearLock').onclick=async()=>{
-  const {error}=await db.from('bolao_state').update({lock_at:null}).eq('id',1);
+  const {error}=await db.from('bolao_state').update({lock_at:null}).eq('pool',POOL);
   if(error) toast('Erro',true); else { lockAt=null; checkLock(); fmtRemain(); toast('Trava removida'); }
 };
 
@@ -413,8 +414,8 @@ document.getElementById('clearLock').onclick=async()=>{
 async function loadRanking(){
   const wrap=document.getElementById('rankWrap');
   const [{data:preds},{data:st}]=await Promise.all([
-    db.from('bolao_predictions').select('name,picks'),
-    db.from('bolao_state').select('results').eq('id',1).single()
+    db.from('bolao_predictions').select('name,picks').eq('pool',POOL),
+    db.from('bolao_state').select('results').eq('pool',POOL).single()
   ]);
   const res=(st&&st.results)||{}; results=res;
   const decided=ORDER.filter(id=>res[id]);
@@ -472,7 +473,7 @@ function buildLegend(){
 document.querySelectorAll('.ptlegend').forEach(el=>el.innerHTML=buildLegend());
 
 (async()=>{
-  try{ const dr=JSON.parse(localStorage.getItem('bolao_draft')||'{}'); if(dr&&typeof dr==='object') myPicks=dr; }catch(e){}
+  try{ const dr=JSON.parse(localStorage.getItem(('bolao_draft_'+POOL))||'{}'); if(dr&&typeof dr==='object') myPicks=dr; }catch(e){}
   normalize(myPicks);
   renderBracket('bracket-palpite', myPicks, {editable:true, clearable:true, results, onpick:refreshReceipt});
   setInterval(fmtRemain,1000);
