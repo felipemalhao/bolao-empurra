@@ -115,6 +115,12 @@
   .lockbox{background:rgba(255,255,255,.95);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .lockbox input{padding:9px;border:1px solid var(--line);border-radius:8px}
   .empty-state{color:#cfe9d8;text-align:center;padding:30px}
+  .ptlegend{display:flex;flex-wrap:wrap;gap:5px;align-items:center;justify-content:center;margin:4px 0 12px}
+  .ptchip{background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:600;display:inline-flex;gap:6px;align-items:center}
+  .ptchip b{background:var(--gold);color:#3b2f00;border-radius:999px;padding:1px 7px;font-weight:800}
+  .ptchip.champ{background:linear-gradient(135deg,#f1c40f,#e67e22);color:#3b2f00}
+  .ptchip.champ b{background:rgba(0,0,0,.18);color:#3b2f00}
+  .ptarrow{color:#8fb9a1;font-weight:800;font-size:13px}
 </style>
 </head>
 <body>
@@ -138,6 +144,7 @@
       <button class="btn gold" id="saveBtn" disabled>💾 Salvar palpite</button>
     </div>
     <p class="hint" id="palpiteHint">Digite seu nome e clique em <b>Entrar</b>. Depois clique no vencedor de cada confronto no chaveamento — eles avançam sozinhos até o campeão. <b>↔ arraste o chaveamento</b> para os lados se não couber na tela.</p>
+    <div class="ptlegend"></div>
     <div class="scrollwrap"><div id="bracket-palpite"></div></div>
     <div class="receipt" id="receiptWrap" style="display:none">
       <div class="rctitle" id="receiptTitle">📋 Recibo do palpite</div>
@@ -163,7 +170,8 @@
       <button class="btn" id="saveLock">Salvar horário</button>
       <button class="btn" id="clearLock" style="background:#7b8a80">Sem trava</button>
     </div>
-    <p class="hint">Clique em quem <b>realmente venceu</b> cada jogo (qualquer um do grupo pode marcar). É salvo automaticamente e o ranking recalcula sozinho. <b>↔ arraste</b> o chaveamento se precisar.</p>
+    <p class="hint">Clique em quem <b>realmente venceu</b> cada jogo (qualquer um do grupo pode marcar). É salvo automaticamente e o ranking recalcula sozinho. <b>Para corrigir/desfazer:</b> clique de novo na seleção já marcada (verde) para desmarcá-la. <b>↔ arraste</b> o chaveamento se precisar.</p>
+    <div class="ptlegend"></div>
     <div class="scrollwrap"><div id="bracket-resultados"></div></div>
   </section>
 </main>
@@ -243,7 +251,7 @@ function matchBox(id, picks, opts){
       row.className='brow'+(winner===team?' win':'')+(res===team?' restrue':'');
       row.title=T[team].n;
       row.innerHTML=`${flagsm(team)}<span class="c">${team}</span>`;
-      if(opts.editable){ row.onclick=()=>{ picks[id]=team; normalize(picks); opts.rerender(); if(opts.onpick)opts.onpick(); }; }
+      if(opts.editable){ row.onclick=()=>{ if(opts.clearable && picks[id]===team){ delete picks[id]; } else { picks[id]=team; } normalize(picks); opts.rerender(); if(opts.onpick)opts.onpick(); }; }
       else row.disabled=true;
     }
     box.appendChild(row);
@@ -342,7 +350,7 @@ document.getElementById('loadBtn').onclick=async()=>{
   document.getElementById('palpiteHint').innerHTML = isLocked
     ? `🔒 Palpites travados. Mostrando o palpite salvo de <b>${myName}</b> (somente leitura).`
     : (data?`Bem-vindo de volta, <b>${myName}</b>! Clique nos vencedores e salve quando quiser.`:`Olá, <b>${myName}</b>! Monte seu chaveamento e clique em Salvar.`);
-  renderBracket('bracket-palpite', myPicks, {editable:!isLocked, results, onpick:refreshReceipt});
+  renderBracket('bracket-palpite', myPicks, {editable:!isLocked, clearable:true, results, onpick:refreshReceipt});
   document.getElementById('receiptWrap').style.display='block';
   document.getElementById('receiptTitle').textContent=`📋 Recibo do palpite de ${myName}`;
   refreshReceipt();
@@ -364,7 +372,7 @@ saveBtn.onclick=async()=>{
 /* ---------- Resultados oficiais ---------- */
 let saveTimer=null;
 function renderResultados(){
-  renderBracket('bracket-resultados', results, {editable:true, results, onpick:()=>{
+  renderBracket('bracket-resultados', results, {editable:true, clearable:true, results, onpick:()=>{
     clearTimeout(saveTimer); saveTimer=setTimeout(saveResults,400);
   }});
 }
@@ -425,11 +433,19 @@ document.querySelectorAll('nav button').forEach(b=>{
 document.getElementById('refreshRank').onclick=loadRanking;
 
 /* ---------- Init ---------- */
+function buildLegend(){
+  return ROUNDS.map(R=>{
+    const champ=R.r===5;
+    return `<span class="ptchip${champ?' champ':''}">${champ?'🏆 ':''}${R.name.replace(' de final','')} <b>${R.pts}</b></span>`;
+  }).join('<span class="ptarrow">›</span>');
+}
+document.querySelectorAll('.ptlegend').forEach(el=>el.innerHTML=buildLegend());
+
 (async()=>{
-  renderBracket('bracket-palpite', myPicks, {editable:true, results, onpick:refreshReceipt});
+  renderBracket('bracket-palpite', myPicks, {editable:true, clearable:true, results, onpick:refreshReceipt});
   setInterval(fmtRemain,1000);
   await loadState();
-  renderBracket('bracket-palpite', myPicks, {editable:!isLocked, results, onpick:refreshReceipt});
+  renderBracket('bracket-palpite', myPicks, {editable:!isLocked, clearable:true, results, onpick:refreshReceipt});
 })();
 </script>
 </body>
