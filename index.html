@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolão da Copa 🏆</title>
+<style>
+  :root{
+    --green:#1a7a3c; --green2:#27ae60; --dark:#0f2c1a; --bg:#0b3d24;
+    --card:#ffffff; --line:#d9e4dc; --gold:#f1c40f; --txt:#16331f; --muted:#7b8a80;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(160deg,#0b3d24,#072a18);color:var(--txt);min-height:100vh}
+  header{background:rgba(0,0,0,.18);padding:14px 16px;text-align:center;color:#fff;position:sticky;top:0;z-index:10;backdrop-filter:blur(6px)}
+  header h1{margin:0;font-size:20px;letter-spacing:.5px}
+  #countdown{font-size:13px;margin-top:4px;color:#cfe9d8}
+  #countdown.locked{color:#ffb4a8;font-weight:700}
+  nav{display:flex;gap:6px;justify-content:center;padding:10px;flex-wrap:wrap}
+  nav button{border:0;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;
+    font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
+  nav button.active{background:var(--gold);color:#3b2f00}
+  main{max-width:1100px;margin:0 auto;padding:0 12px 60px}
+  .panel{display:none}
+  .panel.active{display:block}
+  .namebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:rgba(255,255,255,.95);
+    padding:12px;border-radius:14px;margin-bottom:14px;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+  .namebar input{flex:1;min-width:160px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px}
+  .btn{border:0;padding:11px 18px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;background:var(--green2);color:#fff;transition:.15s}
+  .btn:hover{filter:brightness(1.05)}
+  .btn.gold{background:var(--gold);color:#3b2f00}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .hint{color:var(--muted);font-size:13px;margin:2px 0 0}
+  .round{margin:18px 0}
+  .round h2{color:#fff;font-size:16px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .pts{background:var(--gold);color:#3b2f00;font-size:12px;font-weight:800;padding:2px 9px;border-radius:999px}
+  .matches{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+  .match{background:var(--card);border-radius:12px;padding:8px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .mlabel{font-size:11px;color:var(--muted);margin:0 2px 6px;text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between}
+  .team{display:flex;align-items:center;gap:9px;width:100%;border:1px solid var(--line);background:#fff;
+    padding:9px 10px;border-radius:9px;cursor:pointer;font-size:14px;margin:4px 0;transition:.12s;text-align:left}
+  .team:hover:not(:disabled){border-color:var(--green2);background:#f3fbf6}
+  .team img{width:24px;height:18px;object-fit:cover;border-radius:3px;flex:0 0 auto;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+  .team .code{font-weight:800;width:34px;flex:0 0 auto}
+  .team .nm{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .team.win{background:var(--green2);border-color:var(--green);color:#fff}
+  .team.win .nm{color:#dff5e7}
+  .team.empty{color:#b7c2bb;cursor:default;font-style:italic}
+  .team:disabled{cursor:default}
+  .team.right{flex-direction:row-reverse;text-align:right}
+  .team.right .nm{text-align:right}
+  .side-tag{font-size:11px;color:#bfe3cd;text-transform:uppercase;letter-spacing:1px;margin:6px 0 4px;font-weight:700}
+  .champ{background:linear-gradient(135deg,#f1c40f,#e67e22);color:#3b2f00;border-radius:14px;padding:16px;
+    text-align:center;margin:16px 0;font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .champ img{width:40px;height:30px;border-radius:4px;vertical-align:middle;margin:0 8px}
+  .champ .big{font-size:22px;display:block;margin-top:6px}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+  th,td{padding:11px 10px;text-align:left;font-size:14px;border-bottom:1px solid var(--line)}
+  th{background:var(--green);color:#fff;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  tr:last-child td{border-bottom:0}
+  .rk{font-weight:800;width:42px;text-align:center}
+  .rk1{color:#caa204}.rk2{color:#8c9499}.rk3{color:#b06b2e}
+  td.pt{font-weight:800;text-align:center;color:var(--green)}
+  .miniflag{width:20px;height:15px;border-radius:2px;vertical-align:middle;margin-right:4px;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#16331f;color:#fff;
+    padding:12px 20px;border-radius:10px;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.35);opacity:0;
+    transition:.25s;pointer-events:none;z-index:50;max-width:90%}
+  .toast.show{opacity:1}
+  .toast.err{background:#a3271b}
+  .lockbox{background:rgba(255,255,255,.95);border-radius:12px;padding:12px;margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .lockbox input{padding:9px;border:1px solid var(--line);border-radius:8px}
+  .empty-state{color:#cfe9d8;text-align:center;padding:30px}
+  @media(max-width:520px){.matches{grid-template-columns:1fr 1fr}.team .nm{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏆 Bolão da Copa do Mundo</h1>
+  <div id="countdown">carregando…</div>
+</header>
+
+<nav>
+  <button data-tab="palpite" class="active">📝 Meu Palpite</button>
+  <button data-tab="ranking">🏅 Ranking</button>
+  <button data-tab="resultados">⚽ Resultados Oficiais</button>
+</nav>
+
+<main>
+  <!-- ============ MEU PALPITE ============ -->
+  <section class="panel active" id="panel-palpite">
+    <div class="namebar">
+      <input id="playerName" placeholder="Seu nome (ex: João)" autocomplete="off">
+      <button class="btn" id="loadBtn">Entrar / Carregar</button>
+      <button class="btn gold" id="saveBtn" disabled>💾 Salvar palpite</button>
+    </div>
+    <p class="hint" id="palpiteHint">Digite seu nome e clique em <b>Entrar</b>. Depois toque no vencedor de cada confronto. Os palpites travam no horário marcado.</p>
+    <div id="bracket-palpite"></div>
+  </section>
+
+  <!-- ============ RANKING ============ -->
+  <section class="panel" id="panel-ranking">
+    <div class="namebar" style="justify-content:space-between">
+      <span style="font-weight:700">Classificação geral</span>
+      <button class="btn" id="refreshRank">🔄 Atualizar</button>
+    </div>
+    <p class="hint">Pontos por fase: 16-avos = 1 · Oitavas = 2 · Quartas = 3 · Semis = 4 · Final = 5. O ranking atualiza conforme os resultados oficiais saem.</p>
+    <div id="rankWrap"><div class="empty-state">Carregando…</div></div>
+  </section>
+
+  <!-- ============ RESULTADOS OFICIAIS ============ -->
+  <section class="panel" id="panel-resultados">
+    <div class="lockbox">
+      <span style="font-weight:700">⏰ Trava dos palpites:</span>
+      <input type="datetime-local" id="lockInput">
+      <button class="btn" id="saveLock">Salvar horário</button>
+      <button class="btn" id="clearLock" style="background:#7b8a80">Sem trava</button>
+    </div>
+    <p class="hint">Marque aqui quem <b>realmente venceu</b> cada jogo (qualquer um do grupo pode marcar). É salvo automaticamente e o ranking recalcula sozinho.</p>
+    <div id="bracket-resultados"></div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://eyfhdyairinbapjqolpn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZmhkeWFpcmluYmFwanFvbHBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MDgzNTYsImV4cCI6MjA5NDE4NDM1Nn0.QCfopuLL9piThz0YapJUwIVyZ9wPWx0gQnF4ReK9ZTg';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ---------- Seleções ---------- */
+const T = {
+  ALE:{n:'Alemanha',f:'de'}, PAR:{n:'Paraguai',f:'py'}, FRA:{n:'França',f:'fr'}, SUE:{n:'Suécia',f:'se'},
+  AFS:{n:'África do Sul',f:'za'}, CAN:{n:'Canadá',f:'ca'}, HOL:{n:'Holanda',f:'nl'}, MAR:{n:'Marrocos',f:'ma'},
+  POR:{n:'Portugal',f:'pt'}, CRO:{n:'Croácia',f:'hr'}, ESP:{n:'Espanha',f:'es'}, AUT:{n:'Áustria',f:'at'},
+  EUA:{n:'Estados Unidos',f:'us'}, BOS:{n:'Bósnia',f:'ba'}, BEL:{n:'Bélgica',f:'be'}, SEN:{n:'Senegal',f:'sn'},
+  BRA:{n:'Brasil',f:'br'}, JAP:{n:'Japão',f:'jp'}, CDM:{n:'Costa do Marfim',f:'ci'}, NOR:{n:'Noruega',f:'no'},
+  MEX:{n:'México',f:'mx'}, EQU:{n:'Equador',f:'ec'}, ING:{n:'Inglaterra',f:'gb-eng'}, RDC:{n:'Rep. Dem. Congo',f:'cd'},
+  ARG:{n:'Argentina',f:'ar'}, CAB:{n:'Cabo Verde',f:'cv'}, AUS:{n:'Austrália',f:'au'}, EGI:{n:'Egito',f:'eg'},
+  SUI:{n:'Suíça',f:'ch'}, AGL:{n:'Argélia',f:'dz'}, COL:{n:'Colômbia',f:'co'}, GAN:{n:'Gana',f:'gh'}
+};
+
+/* ---------- Estrutura do chaveamento ---------- */
+const ROUND1 = {
+  r1_l1:['ALE','PAR'], r1_l2:['FRA','SUE'], r1_l3:['AFS','CAN'], r1_l4:['HOL','MAR'],
+  r1_l5:['POR','CRO'], r1_l6:['ESP','AUT'], r1_l7:['EUA','BOS'], r1_l8:['BEL','SEN'],
+  r1_r1:['BRA','JAP'], r1_r2:['CDM','NOR'], r1_r3:['MEX','EQU'], r1_r4:['ING','RDC'],
+  r1_r5:['ARG','CAB'], r1_r6:['AUS','EGI'], r1_r7:['SUI','AGL'], r1_r8:['COL','GAN']
+};
+const MATCHES = {};
+for (const id in ROUND1) MATCHES[id] = {round:1, side:id.includes('_l')?'L':'R', a:{team:ROUND1[id][0]}, b:{team:ROUND1[id][1]}};
+[['r2_l1','r1_l1','r1_l2','L'],['r2_l2','r1_l3','r1_l4','L'],['r2_l3','r1_l5','r1_l6','L'],['r2_l4','r1_l7','r1_l8','L'],
+ ['r2_r1','r1_r1','r1_r2','R'],['r2_r2','r1_r3','r1_r4','R'],['r2_r3','r1_r5','r1_r6','R'],['r2_r4','r1_r7','r1_r8','R']]
+ .forEach(x=>MATCHES[x[0]]={round:2,side:x[3],a:{from:x[1]},b:{from:x[2]}});
+[['r3_l1','r2_l1','r2_l2','L'],['r3_l2','r2_l3','r2_l4','L'],['r3_r1','r2_r1','r2_r2','R'],['r3_r2','r2_r3','r2_r4','R']]
+ .forEach(x=>MATCHES[x[0]]={round:3,side:x[3],a:{from:x[1]},b:{from:x[2]}});
+[['r4_l1','r3_l1','r3_l2','L'],['r4_r1','r3_r1','r3_r2','R']]
+ .forEach(x=>MATCHES[x[0]]={round:4,side:x[3],a:{from:x[1]},b:{from:x[2]}});
+MATCHES['r5_1']={round:5,side:'F',a:{from:'r4_l1'},b:{from:'r4_r1'}};
+
+const ORDER = Object.keys(MATCHES);
+const ROUNDS = [
+  {r:1,name:'16-avos de final',pts:1},
+  {r:2,name:'Oitavas de final',pts:2},
+  {r:3,name:'Quartas de final',pts:3},
+  {r:4,name:'Semifinais',pts:4},
+  {r:5,name:'Final',pts:5}
+];
+const PTS = {1:1,2:2,3:3,4:4,5:5};
+
+/* ---------- Helpers ---------- */
+function resolve(slot, picks){ return slot.team ? slot.team : (picks[slot.from] || null); }
+function normalize(picks){
+  ORDER.forEach(id=>{
+    const m=MATCHES[id], a=resolve(m.a,picks), b=resolve(m.b,picks);
+    if(picks[id] && picks[id]!==a && picks[id]!==b) delete picks[id];
+  });
+  return picks;
+}
+function flag(code){ return T[code] ? `<img class="miniflag" src="https://flagcdn.com/w40/${T[code].f}.png" alt="">` : ''; }
+function toast(msg, err){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(err?' err':''); setTimeout(()=>t.className='toast',2600); }
+
+/* ---------- Render do bracket ---------- */
+function renderBracket(containerId, picks, opts){
+  const el=document.getElementById(containerId); el.innerHTML='';
+  ROUNDS.forEach(R=>{
+    const ids=ORDER.filter(id=>MATCHES[id].round===R.r);
+    const sec=document.createElement('div'); sec.className='round';
+    sec.innerHTML=`<h2>${R.name} <span class="pts">${R.pts} pt${R.pts>1?'s':''}/acerto</span></h2>`;
+    const grid=document.createElement('div'); grid.className='matches';
+    ids.forEach((id,i)=>{
+      const m=MATCHES[id], a=resolve(m.a,picks), b=resolve(m.b,picks);
+      const winner=picks[id];
+      const card=document.createElement('div'); card.className='match';
+      const correct = opts.results && opts.results[id] ? (winner===opts.results[id]?' ✅':(winner?' ❌':'')) : '';
+      card.innerHTML=`<div class="mlabel"><span>${R.r===5?'FINAL':'Jogo '+(i+1)}</span><span>${correct}</span></div>`;
+      [['a',a],['b',b]].forEach(([slot,team])=>{
+        const btn=document.createElement('button');
+        if(!team){ btn.className='team empty'; btn.disabled=true; btn.innerHTML='<span class="nm">Aguardando…</span>'; }
+        else {
+          btn.className='team'+(winner===team?' win':'');
+          btn.innerHTML=`${flag(team)}<span class="code">${team}</span><span class="nm">${T[team].n}</span>`;
+          if(opts.editable){ btn.onclick=()=>{ picks[id]=team; normalize(picks); renderBracket(containerId,picks,opts); if(opts.onpick)opts.onpick(); }; }
+          else btn.disabled=true;
+        }
+        card.appendChild(btn);
+      });
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid);
+    el.appendChild(sec);
+    if(R.r===5){
+      const champ=picks['r5_1'];
+      const cd=document.createElement('div'); cd.className='champ';
+      cd.innerHTML = champ
+        ? `CAMPEÃO ${flag2(champ)}<span class="big">${T[champ].n}</span>`
+        : `🏆 <span class="big">Escolha o campeão!</span>`;
+      el.appendChild(cd);
+    }
+  });
+}
+function flag2(code){ return `<img src="https://flagcdn.com/w80/${T[code].f}.png" alt="">`; }
+
+/* ---------- Estado ---------- */
+let lockAt=null, isLocked=false, myPicks={}, myName='', results={};
+
+function checkLock(){
+  if(!lockAt){ isLocked=false; return; }
+  isLocked = Date.now() >= new Date(lockAt).getTime();
+}
+function fmtRemain(){
+  const cd=document.getElementById('countdown');
+  if(!lockAt){ cd.textContent='Palpites abertos (sem horário de trava definido)'; cd.className=''; return; }
+  const diff=new Date(lockAt).getTime()-Date.now();
+  if(diff<=0){ cd.textContent='🔒 PALPITES TRAVADOS — agora é torcer!'; cd.className='locked'; isLocked=true; return; }
+  const d=Math.floor(diff/864e5),h=Math.floor(diff/36e5)%24,m=Math.floor(diff/6e4)%60,s=Math.floor(diff/1e3)%60;
+  cd.textContent=`⏳ Palpites travam em ${d>0?d+'d ':''}${h}h ${m}m ${s}s`; cd.className='';
+}
+
+async function loadState(){
+  const {data}=await db.from('bolao_state').select('*').eq('id',1).single();
+  if(data){ lockAt=data.lock_at; results=data.results||{}; }
+  checkLock(); fmtRemain();
+  if(lockAt){ const dt=new Date(new Date(lockAt).getTime()-new Date().getTimezoneOffset()*0); document.getElementById('lockInput').value=toLocalInput(lockAt); }
+}
+function toLocalInput(iso){ const d=new Date(iso); const p=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; }
+
+/* ---------- Meu palpite ---------- */
+const nameInput=document.getElementById('playerName');
+const saveBtn=document.getElementById('saveBtn');
+function nameKey(n){ return n.trim().toLowerCase().replace(/\s+/g,' '); }
+
+document.getElementById('loadBtn').onclick=async()=>{
+  const n=nameInput.value.trim();
+  if(!n){ toast('Digite seu nome primeiro',true); return; }
+  myName=n;
+  const {data}=await db.from('bolao_predictions').select('picks').eq('name_key',nameKey(n)).maybeSingle();
+  myPicks = data ? (data.picks||{}) : {};
+  normalize(myPicks);
+  checkLock();
+  saveBtn.disabled=isLocked;
+  document.getElementById('palpiteHint').innerHTML = isLocked
+    ? `🔒 Palpites travados. Mostrando o palpite salvo de <b>${myName}</b> (somente leitura).`
+    : (data?`Bem-vindo de volta, <b>${myName}</b>! Edite e salve quando quiser.`:`Olá, <b>${myName}</b>! Monte seu palpite e clique em Salvar.`);
+  renderBracket('bracket-palpite', myPicks, {editable:!isLocked, results});
+  if(!isLocked) toast(data?'Palpite carregado':'Novo palpite — boa sorte!');
+};
+
+saveBtn.onclick=async()=>{
+  if(!myName){ toast('Entre com seu nome primeiro',true); return; }
+  saveBtn.disabled=true;
+  const {error}=await db.from('bolao_predictions')
+    .upsert({name:myName, name_key:nameKey(myName), picks:myPicks}, {onConflict:'name_key'});
+  if(error){
+    if((error.message||'').includes('PALPITES_TRAVADOS')){ toast('🔒 Palpites já travaram!',true); checkLock(); fmtRemain(); }
+    else toast('Erro ao salvar: '+error.message,true);
+  } else { toast('✅ Palpite salvo!'); saveBtn.disabled=false; }
+  saveBtn.disabled=isLocked;
+};
+
+/* ---------- Resultados oficiais ---------- */
+let saveTimer=null;
+function renderResultados(){
+  renderBracket('bracket-resultados', results, {editable:true, results, onpick:()=>{
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(saveResults,400);
+  }});
+}
+async function saveResults(){
+  const {error}=await db.from('bolao_state').update({results, updated_at:new Date().toISOString()}).eq('id',1);
+  if(error) toast('Erro ao salvar resultado',true); else toast('Resultado salvo ✅');
+}
+document.getElementById('saveLock').onclick=async()=>{
+  const v=document.getElementById('lockInput').value;
+  if(!v){ toast('Escolha uma data/hora',true); return; }
+  const iso=new Date(v).toISOString();
+  const {error}=await db.from('bolao_state').update({lock_at:iso}).eq('id',1);
+  if(error) toast('Erro',true); else { lockAt=iso; checkLock(); fmtRemain(); toast('Horário de trava salvo'); }
+};
+document.getElementById('clearLock').onclick=async()=>{
+  const {error}=await db.from('bolao_state').update({lock_at:null}).eq('id',1);
+  if(error) toast('Erro',true); else { lockAt=null; checkLock(); fmtRemain(); toast('Trava removida'); }
+};
+
+/* ---------- Ranking ---------- */
+async function loadRanking(){
+  const wrap=document.getElementById('rankWrap');
+  const [{data:preds},{data:st}]=await Promise.all([
+    db.from('bolao_predictions').select('name,picks'),
+    db.from('bolao_state').select('results').eq('id',1).single()
+  ]);
+  const res=(st&&st.results)||{};
+  const decided=ORDER.filter(id=>res[id]);
+  if(!preds||!preds.length){ wrap.innerHTML='<div class="empty-state">Ninguém preencheu o bolão ainda. Seja o primeiro! 😉</div>'; return; }
+  const rows=preds.map(p=>{
+    const pk=p.picks||{}; let pts=0,hits=0;
+    decided.forEach(id=>{ if(pk[id]===res[id]){ pts+=PTS[MATCHES[id].round]; hits++; } });
+    return {name:p.name, pts, hits, champ:pk['r5_1']};
+  }).sort((a,b)=> b.pts-a.pts || b.hits-a.hits || a.name.localeCompare(b.name));
+  let html=`<table><thead><tr><th class="rk">#</th><th>Nome</th><th style="text-align:center">Pontos</th><th style="text-align:center">Acertos</th><th>Campeão palpitado</th></tr></thead><tbody>`;
+  rows.forEach((r,i)=>{
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+    html+=`<tr><td class="rk rk${i+1}">${medal}</td><td>${escapeHtml(r.name)}</td><td class="pt">${r.pts}</td><td style="text-align:center">${r.hits}</td><td>${r.champ?flag(r.champ)+T[r.champ].n:'<span style="color:#b7c2bb">—</span>'}</td></tr>`;
+  });
+  html+='</tbody></table>';
+  html+=`<p class="hint" style="color:#cfe9d8">${decided.length} de ${ORDER.length} jogos com resultado lançado · ${rows.length} participante(s)</p>`;
+  wrap.innerHTML=html;
+}
+function escapeHtml(s){ return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------- Navegação ---------- */
+document.querySelectorAll('nav button').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const tab=b.dataset.tab;
+    document.getElementById('panel-'+tab).classList.add('active');
+    if(tab==='ranking') loadRanking();
+    if(tab==='resultados') renderResultados();
+  };
+});
+document.getElementById('refreshRank').onclick=loadRanking;
+
+/* ---------- Init ---------- */
+(async()=>{
+  await loadState();
+  renderBracket('bracket-palpite', myPicks, {editable:!isLocked, results});
+  setInterval(fmtRemain,1000);
+})();
+</script>
+</body>
+</html>
