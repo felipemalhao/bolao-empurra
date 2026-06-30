@@ -15,8 +15,7 @@
     background:linear-gradient(160deg,#0b3d24,#072a18);color:var(--txt);min-height:100vh}
   header{background:rgba(0,0,0,.18);padding:14px 16px;text-align:center;color:#fff;position:sticky;top:0;z-index:10;backdrop-filter:blur(6px)}
   header h1{margin:0;font-size:20px;letter-spacing:.5px}
-  #countdown{font-size:13px;margin-top:4px;color:#cfe9d8}
-  #countdown.locked{color:#ffb4a8;font-weight:700}
+  .sub{font-size:13px;margin-top:4px;color:#cfe9d8}
   nav{display:flex;gap:6px;justify-content:center;padding:10px;flex-wrap:wrap}
   nav button{border:0;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;
     font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
@@ -24,15 +23,13 @@
   main{max-width:1280px;margin:0 auto;padding:0 12px 60px}
   .panel{display:none}
   .panel.active{display:block}
-  .namebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:rgba(255,255,255,.95);
+  .bar-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:rgba(255,255,255,.95);
     padding:12px;border-radius:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(0,0,0,.15)}
-  .namebar input{flex:1;min-width:160px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px}
   .btn{border:0;padding:11px 18px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;background:var(--green2);color:#fff;transition:.15s}
   .btn:hover{filter:brightness(1.05)}
-  .btn.gold{background:var(--gold);color:#3b2f00}
-  .btn:disabled{opacity:.5;cursor:not-allowed}
   .hint{color:#cfe9d8;font-size:13px;margin:6px 2px}
   .hint b{color:#fff}
+  .notice{background:rgba(241,196,15,.16);border:1px solid rgba(241,196,15,.4);color:#fff;border-radius:10px;padding:10px 12px;font-size:13px;margin:0 0 12px}
 
   /* ---------- BRACKET ---------- */
   .scrollwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
@@ -56,15 +53,12 @@
     width:20px;height:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.3)}
   .resmark:empty{display:none}
 
-  /* connectors — LEFT side (flows left→right, box on the right) */
   .side.left .children{margin-right:34px}
   .side.left .children>.node{position:relative}
   .side.left .children>.node::after{content:'';position:absolute;left:100%;top:50%;width:17px;height:2px;background:var(--cline)}
   .side.left .children>.node:first-child::before{content:'';position:absolute;left:calc(100% + 17px);top:50%;height:calc(50% + 3px);width:2px;background:var(--cline)}
   .side.left .children>.node:last-child::before{content:'';position:absolute;left:calc(100% + 17px);bottom:50%;height:calc(50% + 3px);width:2px;background:var(--cline)}
   .side.left .children+.matchbox::before{content:'';position:absolute;right:100%;top:50%;width:17px;height:2px;background:var(--cline)}
-
-  /* connectors — RIGHT side (mirrored: box on the left) */
   .side.right .node{flex-direction:row-reverse}
   .side.right .children{margin-left:34px}
   .side.right .children>.node{position:relative}
@@ -72,8 +66,6 @@
   .side.right .children>.node:first-child::before{content:'';position:absolute;right:calc(100% + 17px);top:50%;height:calc(50% + 3px);width:2px;background:var(--cline)}
   .side.right .children>.node:last-child::before{content:'';position:absolute;right:calc(100% + 17px);bottom:50%;height:calc(50% + 3px);width:2px;background:var(--cline)}
   .side.right .children+.matchbox::before{content:'';position:absolute;left:100%;top:50%;width:17px;height:2px;background:var(--cline)}
-
-  /* center: final + trophy */
   .center{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 10px}
   .finalbox{width:122px}
   .finalbox::before{content:'';position:absolute;right:100%;top:50%;width:14px;height:2px;background:var(--cline)}
@@ -98,22 +90,61 @@
   .rcrow.champ .rclbl,.rcrow.champ .rcchip{color:#b8860b}
   .rcrow.champ{background:linear-gradient(90deg,rgba(241,196,15,.15),transparent);border-radius:8px}
 
-  /* ranking */
+  /* ---------- RANKING ---------- */
   table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.15)}
   th,td{padding:11px 10px;text-align:left;font-size:14px;border-bottom:1px solid var(--line)}
   th{background:var(--green);color:#fff;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
   tr:last-child td{border-bottom:0}
-  .rk{font-weight:800;width:42px;text-align:center}
+  .rk{font-weight:800;width:42px;text-align:center;font-size:16px}
   td.pt{font-weight:800;text-align:center;color:var(--green)}
   .miniflag{width:20px;height:15px;border-radius:2px;vertical-align:middle;margin-right:4px;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
+  .rankname{cursor:pointer;color:var(--green);font-weight:700;text-decoration:underline dotted}
+  .rankname:hover{color:var(--green2)}
+  tr.leader td{background:linear-gradient(90deg,rgba(241,196,15,.28),transparent)}
+  tr.lanterna td{background:linear-gradient(90deg,rgba(192,57,43,.16),transparent)}
+  .tag{font-size:10px;font-weight:800;border-radius:999px;padding:2px 7px;margin-left:6px;vertical-align:middle;white-space:nowrap}
+  .tag.lider{background:var(--gold);color:#3b2f00}
+  .tag.lant{background:#c0392b;color:#fff}
+  .verbtn{border:0;background:var(--green);color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .verbtn:hover{background:var(--green2)}
+
+  /* ---------- ESTATÍSTICAS ---------- */
+  .phasesel{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .phbtn{border:0;background:rgba(255,255,255,.12);color:#fff;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer}
+  .phbtn.on{background:var(--gold);color:#3b2f00}
+  .phbtn.now{box-shadow:0 0 0 2px var(--gold)}
+  .statover{background:rgba(255,255,255,.1);color:#eafff1;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:10px;line-height:1.5}
+  .statover b{color:#fff}
+  .statover img{width:18px;height:13px;border-radius:2px;vertical-align:middle;margin:0 3px}
+  .gcard{background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:10px;box-shadow:0 3px 10px rgba(0,0,0,.18)}
+  .ghead{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px;margin-bottom:8px;gap:8px}
+  .ghead img{width:22px;height:16px;border-radius:2px;vertical-align:middle;margin-right:4px}
+  .ghead .vs{color:var(--muted);font-weight:600;margin:0 4px}
+  .gpts{background:var(--gold);color:#3b2f00;border-radius:999px;padding:2px 9px;font-size:12px;flex:0 0 auto}
+  .gres{font-size:13px;color:var(--green);font-weight:700;margin-bottom:8px}
+  .gres img{width:20px;height:15px;border-radius:2px;vertical-align:middle;margin-right:4px}
+  .gnone{color:var(--muted);font-style:italic;font-size:13px}
+  .bar{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}
+  .bar .barlbl{flex:0 0 76px;display:flex;align-items:center;gap:5px;font-weight:700}
+  .bar .barlbl img{width:20px;height:15px;border-radius:2px}
+  .bartrack{flex:1;background:#eef2ef;border-radius:6px;height:16px;overflow:hidden}
+  .barfill{height:100%;background:var(--green2);border-radius:6px;min-width:3px}
+  .bar.barhit .barfill{background:var(--gold)}
+  .barn{flex:0 0 70px;text-align:right;font-weight:700}
+  .barn span{color:var(--muted);font-weight:600}
+  .voters{margin-top:8px;font-size:12px}
+  .voters summary{cursor:pointer;color:var(--green);font-weight:700}
+  .vlist{margin-top:6px}
+  .vrow{display:flex;gap:8px;padding:4px 0;border-top:1px solid var(--line)}
+  .vrow .vt{flex:0 0 76px;font-weight:700;display:flex;align-items:center;gap:4px}
+  .vrow .vt img{width:18px;height:13px;border-radius:2px}
+  .vrow .vn{color:var(--muted)}
 
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#16331f;color:#fff;
     padding:12px 20px;border-radius:10px;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.35);opacity:0;
     transition:.25s;pointer-events:none;z-index:50;max-width:90%}
   .toast.show{opacity:1}
   .toast.err{background:#a3271b}
-  .lockbox{background:rgba(255,255,255,.95);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .lockbox input{padding:9px;border:1px solid var(--line);border-radius:8px}
   .empty-state{color:#cfe9d8;text-align:center;padding:30px}
   .ptlegend{display:flex;flex-wrap:wrap;gap:5px;align-items:center;justify-content:center;margin:4px 0 12px}
   .ptchip{background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:600;display:inline-flex;gap:6px;align-items:center}
@@ -121,8 +152,6 @@
   .ptchip.champ{background:linear-gradient(135deg,#f1c40f,#e67e22);color:#3b2f00}
   .ptchip.champ b{background:rgba(0,0,0,.18);color:#3b2f00}
   .ptarrow{color:#8fb9a1;font-weight:800;font-size:13px}
-  .rankname{cursor:pointer;color:var(--green);font-weight:700;text-decoration:underline dotted}
-  .rankname:hover{color:var(--green2)}
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:flex-start;justify-content:center;z-index:100;padding:18px 8px;overflow:auto}
   .modal.show{display:flex}
   .modal-card{background:linear-gradient(160deg,#0e4429,#0a2e1b);border-radius:16px;max-width:1240px;width:100%;padding:14px;box-shadow:0 12px 44px rgba(0,0,0,.55)}
@@ -134,51 +163,40 @@
 <body>
 <header>
   <h1>🏆 Bolão Empurra</h1>
-  <div id="countdown">carregando…</div>
+  <div class="sub">Palpites encerrados — acompanhe o ranking e os jogos 🔥</div>
 </header>
 
 <nav>
-  <button data-tab="palpite" class="active">📝 Meu Palpite</button>
-  <button data-tab="ranking">🏅 Ranking</button>
-  <button data-tab="resultados">⚽ Resultados Oficiais</button>
+  <button data-tab="ranking" class="active">🏅 Ranking</button>
+  <button data-tab="estatisticas">📊 Estatísticas</button>
+  <button data-tab="resultados">⚽ Resultados</button>
 </nav>
 
 <main>
-  <!-- ============ MEU PALPITE ============ -->
-  <section class="panel active" id="panel-palpite">
-    <div class="namebar">
-      <input id="playerName" placeholder="Seu nome (ex: João)" autocomplete="off">
-      <button class="btn" id="loadBtn">Entrar / Carregar</button>
-      <button class="btn gold" id="saveBtn" disabled>💾 Salvar palpite</button>
-    </div>
-    <p class="hint" id="palpiteHint">Digite seu nome e clique em <b>Entrar</b>. Depois clique no vencedor de cada confronto no chaveamento — eles avançam sozinhos até o campeão. <b>↔ arraste o chaveamento</b> para os lados se não couber na tela.</p>
-    <div class="ptlegend"></div>
-    <div class="scrollwrap"><div id="bracket-palpite"></div></div>
-    <div class="receipt" id="receiptWrap" style="display:none">
-      <div class="rctitle" id="receiptTitle">📋 Recibo do palpite</div>
-      <div id="receipt"></div>
-    </div>
-  </section>
-
   <!-- ============ RANKING ============ -->
-  <section class="panel" id="panel-ranking">
-    <div class="namebar" style="justify-content:space-between">
+  <section class="panel active" id="panel-ranking">
+    <div class="bar-top">
       <span style="font-weight:700">Classificação geral</span>
       <button class="btn" id="refreshRank">🔄 Atualizar</button>
     </div>
-    <p class="hint">Pontos por fase: 16-avos = 1 · Oitavas = 2 · Quartas = 5 · Semis = 7 · Final = 10. Você pontua se acertar a seleção que se classifica em cada vaga (não importa o adversário). O ranking atualiza conforme os resultados oficiais saem.</p>
+    <div class="notice">👁 <b>Quer xeretar?</b> Clique no nome de qualquer um (ou no botão <b>Ver</b>) para abrir o chaveamento completo dele.</div>
+    <p class="hint">Pontos por fase: 16-avos = 1 · Oitavas = 2 · Quartas = 5 · Semis = 7 · Final = 10. Você pontua se acertar a seleção que se classifica em cada vaga (não importa o adversário).</p>
     <div id="rankWrap"><div class="empty-state">Carregando…</div></div>
+  </section>
+
+  <!-- ============ ESTATÍSTICAS ============ -->
+  <section class="panel" id="panel-estatisticas">
+    <div class="bar-top">
+      <span style="font-weight:700">📊 Estatísticas dos jogos</span>
+      <button class="btn" id="refreshStats">🔄 Atualizar</button>
+    </div>
+    <p class="hint">Quantas pessoas apostaram em cada classificado, por fase. Abre na <b>fase da vez</b> (jogos ainda em aberto).</p>
+    <div id="statsWrap"><div class="empty-state">Carregando…</div></div>
   </section>
 
   <!-- ============ RESULTADOS OFICIAIS ============ -->
   <section class="panel" id="panel-resultados">
-    <div class="lockbox">
-      <span style="font-weight:700">⏰ Trava dos palpites:</span>
-      <input type="datetime-local" id="lockInput">
-      <button class="btn" id="saveLock">Salvar horário</button>
-      <button class="btn" id="clearLock" style="background:#7b8a80">Sem trava</button>
-    </div>
-    <p class="hint">Clique em quem <b>realmente venceu</b> cada jogo (qualquer um do grupo pode marcar). É salvo automaticamente e o ranking recalcula sozinho. <b>Para corrigir/desfazer:</b> clique de novo na seleção já marcada (verde) para desmarcá-la. <b>↔ arraste</b> o chaveamento se precisar.</p>
+    <div class="notice">⚽ Marque quem <b>realmente se classificou</b> em cada jogo. É salvo na hora e <b>vale para os dois bolões</b> de uma vez. Para corrigir, clique de novo na seleção verde para desmarcar.</div>
     <div class="ptlegend"></div>
     <div class="scrollwrap"><div id="bracket-resultados"></div></div>
   </section>
@@ -199,7 +217,7 @@
 const SUPABASE_URL = 'https://eyfhdyairinbapjqolpn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZmhkeWFpcmluYmFwanFvbHBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MDgzNTYsImV4cCI6MjA5NDE4NDM1Nn0.QCfopuLL9piThz0YapJUwIVyZ9wPWx0gQnF4ReK9ZTg';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const POOL = 'empurra'; // identifica este bolão (dados isolados por pool)
+const POOL = 'empurra'; // identifica este bolão (palpites isolados por pool; resultados são compartilhados)
 
 /* ---------- Seleções ---------- */
 const T = {
@@ -254,6 +272,7 @@ function flagsm(code){ return T[code] ? `<img src="https://flagcdn.com/w40/${T[c
 function flagmini(code){ return T[code] ? `<img class="miniflag" src="https://flagcdn.com/w40/${T[code].f}.png" alt="">` : ''; }
 function flag2(code){ return `<img src="https://flagcdn.com/w80/${T[code].f}.png" alt="">`; }
 function toast(msg, err){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(err?' err':''); setTimeout(()=>t.className='toast',2600); }
+function escapeHtml(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 /* ---------- Render do bracket ---------- */
 function matchBox(id, picks, opts){
@@ -291,10 +310,8 @@ function renderBracket(containerId, picks, opts){
   opts.rerender = ()=>renderBracket(containerId, picks, opts);
   const el=document.getElementById(containerId); el.innerHTML='';
   const wrap=document.createElement('div'); wrap.className='bracket';
-
   const left=document.createElement('div'); left.className='side left';
   left.appendChild(buildNode('r4_l1', picks, opts));
-
   const center=document.createElement('div'); center.className='center';
   const lbl=document.createElement('div'); lbl.className='finlabel'; lbl.textContent='FINAL'; center.appendChild(lbl);
   const fbox=matchBox('r5_1', picks, opts); fbox.classList.add('finalbox'); center.appendChild(fbox);
@@ -304,10 +321,8 @@ function renderBracket(containerId, picks, opts){
     ? `${flag2(champ)}<div class="big">${T[champ].n}</div><div class="cap">Campeão</div>`
     : `<div class="emoji">🏆</div><div class="cap">Campeão</div>`;
   center.appendChild(tr);
-
   const right=document.createElement('div'); right.className='side right';
   right.appendChild(buildNode('r4_r1', picks, opts));
-
   wrap.appendChild(left); wrap.appendChild(center); wrap.appendChild(right);
   el.appendChild(wrap);
 }
@@ -322,118 +337,58 @@ function renderReceipt(picks, elId){
     const isChamp=R.r===5;
     const val = chosen.length
       ? chosen.map(c=>`<span class="rcchip">${flagsm(c)}${c} <span style="color:#7b8a80;font-weight:600">${T[c].n}</span></span>`).join('')
-      : '<i>nada escolhido ainda</i>';
+      : '<i>—</i>';
     h+=`<div class="rcrow${isChamp?' champ':''}"><span class="rclbl">${isChamp?'🏆 Campeão':R.name}</span><span class="rcval">${val}</span></div>`;
   });
   el.innerHTML=h;
 }
 
 /* ---------- Estado ---------- */
-let lockAt=null, isLocked=false, myPicks={}, myName='', results={}, rankRows=[];
+let results={}, rankRows=[], allPreds=[], statsRound=null, saveTimer=null;
 
-function checkLock(){ isLocked = lockAt ? (Date.now() >= new Date(lockAt).getTime()) : false; }
-function fmtRemain(){
-  const cd=document.getElementById('countdown');
-  if(!lockAt){ cd.textContent='Palpites abertos (sem horário de trava definido)'; cd.className=''; return; }
-  const diff=new Date(lockAt).getTime()-Date.now();
-  if(diff<=0){ cd.textContent='🔒 PALPITES TRAVADOS — agora é torcer!'; cd.className='locked'; isLocked=true; return; }
-  const d=Math.floor(diff/864e5),h=Math.floor(diff/36e5)%24,m=Math.floor(diff/6e4)%60,s=Math.floor(diff/1e3)%60;
-  cd.textContent=`⏳ Palpites travam em ${d>0?d+'d ':''}${h}h ${m}m ${s}s`; cd.className='';
+async function loadResults(){
+  const {data}=await db.from('bolao_results').select('results').eq('id',1).single();
+  results=(data&&data.results)||{};
+  return results;
 }
-async function loadState(){
-  const {data}=await db.from('bolao_state').select('*').eq('pool',POOL).single();
-  if(data){ lockAt=data.lock_at; results=data.results||{}; }
-  checkLock(); fmtRemain();
-  if(lockAt) document.getElementById('lockInput').value=toLocalInput(lockAt);
+async function loadPreds(){
+  const {data}=await db.from('bolao_predictions').select('name,picks').eq('pool',POOL);
+  allPreds=data||[];
+  return allPreds;
 }
-function toLocalInput(iso){ const d=new Date(iso); const p=n=>String(n).padStart(2,'0');
-  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; }
-
-/* ---------- Meu palpite ---------- */
-const nameInput=document.getElementById('playerName');
-const saveBtn=document.getElementById('saveBtn');
-function nameKey(n){ return n.trim().toLowerCase().replace(/\s+/g,' '); }
-function saveDraft(){ try{ localStorage.setItem(('bolao_draft_'+POOL), JSON.stringify(myPicks)); }catch(e){} }
-function refreshReceipt(){ renderReceipt(myPicks); saveDraft(); }
-
-document.getElementById('loadBtn').onclick=async()=>{
-  const n=nameInput.value.trim();
-  if(!n){ toast('Digite seu nome primeiro',true); return; }
-  myName=n;
-  const {data}=await db.from('bolao_predictions').select('picks').eq('pool',POOL).eq('name_key',nameKey(n)).maybeSingle();
-  if(data){ myPicks = data.picks||{}; }   // tem palpite salvo -> carrega; senao, mantem o que ja foi clicado
-  normalize(myPicks);
-  checkLock();
-  saveBtn.disabled=isLocked;
-  document.getElementById('palpiteHint').innerHTML = isLocked
-    ? `🔒 Palpites travados. Mostrando o palpite salvo de <b>${myName}</b> (somente leitura).`
-    : (data?`Bem-vindo de volta, <b>${myName}</b>! Clique nos vencedores e salve quando quiser.`:`Olá, <b>${myName}</b>! Monte seu chaveamento e clique em Salvar.`);
-  renderBracket('bracket-palpite', myPicks, {editable:!isLocked, clearable:true, results, onpick:refreshReceipt});
-  document.getElementById('receiptWrap').style.display='block';
-  document.getElementById('receiptTitle').textContent=`📋 Recibo do palpite de ${myName}`;
-  refreshReceipt();
-  if(!isLocked) toast(data?'Palpite carregado':'Novo palpite — boa sorte!');
-};
-
-saveBtn.onclick=async()=>{
-  if(!myName){ toast('Entre com seu nome primeiro',true); return; }
-  saveBtn.disabled=true;
-  const {error}=await db.from('bolao_predictions')
-    .upsert({pool:POOL, name:myName, name_key:nameKey(myName), picks:myPicks}, {onConflict:'pool,name_key'});
-  if(error){
-    if((error.message||'').includes('PALPITES_TRAVADOS')){ toast('🔒 Palpites já travaram!',true); checkLock(); fmtRemain(); }
-    else toast('Erro ao salvar: '+error.message,true);
-  } else { toast('✅ Palpite salvo!'); }
-  saveBtn.disabled=isLocked;
-};
-
-/* ---------- Resultados oficiais ---------- */
-let saveTimer=null;
-function renderResultados(){
-  renderBracket('bracket-resultados', results, {editable:true, clearable:true, results, onpick:()=>{
-    clearTimeout(saveTimer); saveTimer=setTimeout(saveResults,400);
-  }});
-}
-async function saveResults(){
-  const {error}=await db.from('bolao_state').update({results, updated_at:new Date().toISOString()}).eq('pool',POOL);
-  if(error) toast('Erro ao salvar resultado',true); else toast('Resultado salvo ✅');
-}
-document.getElementById('saveLock').onclick=async()=>{
-  const v=document.getElementById('lockInput').value;
-  if(!v){ toast('Escolha uma data/hora',true); return; }
-  const iso=new Date(v).toISOString();
-  const {error}=await db.from('bolao_state').update({lock_at:iso}).eq('pool',POOL);
-  if(error) toast('Erro',true); else { lockAt=iso; checkLock(); fmtRemain(); toast('Horário de trava salvo'); }
-};
-document.getElementById('clearLock').onclick=async()=>{
-  const {error}=await db.from('bolao_state').update({lock_at:null}).eq('pool',POOL);
-  if(error) toast('Erro',true); else { lockAt=null; checkLock(); fmtRemain(); toast('Trava removida'); }
-};
 
 /* ---------- Ranking ---------- */
 async function loadRanking(){
   const wrap=document.getElementById('rankWrap');
-  const [{data:preds},{data:st}]=await Promise.all([
-    db.from('bolao_predictions').select('name,picks').eq('pool',POOL),
-    db.from('bolao_state').select('results').eq('pool',POOL).single()
-  ]);
-  const res=(st&&st.results)||{}; results=res;
+  await Promise.all([loadPreds(), loadResults()]);
+  const preds=allPreds, res=results;
   const decided=ORDER.filter(id=>res[id]);
-  if(!preds||!preds.length){ wrap.innerHTML='<div class="empty-state">Ninguém preencheu o bolão ainda. Seja o primeiro! 😉</div>'; return; }
+  if(!preds.length){ wrap.innerHTML='<div class="empty-state">Ninguém preencheu este bolão. 😉</div>'; return; }
   rankRows=preds.map(p=>{
     const pk=p.picks||{}; let pts=0,hits=0;
     decided.forEach(id=>{ if(pk[id]===res[id]){ pts+=PTS[MATCHES[id].round]; hits++; } });
     return {name:p.name, picks:pk, pts, hits, champ:pk['r5_1']};
   }).sort((a,b)=> b.pts-a.pts || b.hits-a.hits || a.name.localeCompare(b.name));
-  let html=`<table><thead><tr><th class="rk">#</th><th>Nome</th><th style="text-align:center">Pontos</th><th style="text-align:center">Acertos</th><th>Campeão palpitado</th></tr></thead><tbody>`;
+  const showTags = decided.length>0 && rankRows.length>1;
+  let html=`<table><thead><tr><th class="rk">#</th><th>Nome</th><th style="text-align:center">Pontos</th><th style="text-align:center">Acertos</th><th>Campeão</th><th></th></tr></thead><tbody>`;
   rankRows.forEach((r,i)=>{
-    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
-    html+=`<tr><td class="rk">${medal}</td><td><span class="rankname" data-i="${i}">${escapeHtml(r.name)}</span></td><td class="pt">${r.pts}</td><td style="text-align:center">${r.hits}</td><td>${r.champ?flagmini(r.champ)+T[r.champ].n:'<span style="color:#b7c2bb">—</span>'}</td></tr>`;
+    const last = i===rankRows.length-1;
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+    const cls = showTags&&i===0 ? 'leader' : (showTags&&last ? 'lanterna' : '');
+    let tag='';
+    if(showTags&&i===0) tag='<span class="tag lider">👑 LÍDER</span>';
+    else if(showTags&&last) tag='<span class="tag lant">🐢 LANTERNA</span>';
+    html+=`<tr class="${cls}"><td class="rk">${medal}</td>`+
+      `<td><span class="rankname" data-i="${i}">${escapeHtml(r.name)}</span>${tag}</td>`+
+      `<td class="pt">${r.pts}</td>`+
+      `<td style="text-align:center">${r.hits}</td>`+
+      `<td>${r.champ?flagmini(r.champ)+T[r.champ].n:'<span style="color:#b7c2bb">—</span>'}</td>`+
+      `<td style="text-align:right"><button class="verbtn" data-i="${i}">👁 ver</button></td></tr>`;
   });
   html+='</tbody></table>';
-  html+=`<p class="hint">👆 Clique em um nome para ver o palpite completo · ${decided.length} de ${ORDER.length} jogos com resultado lançado · ${rankRows.length} participante(s)</p>`;
+  html+=`<p class="hint">${decided.length} de ${ORDER.length} jogos com resultado · ${rankRows.length} participante(s)</p>`;
   wrap.innerHTML=html;
-  wrap.querySelectorAll('.rankname').forEach(s=>{ s.onclick=()=>openPalpite(rankRows[+s.dataset.i]); });
+  wrap.querySelectorAll('.rankname,.verbtn').forEach(s=>{ s.onclick=()=>openPalpite(rankRows[+s.dataset.i]); });
 }
 function openPalpite(row){
   if(!row) return;
@@ -442,7 +397,69 @@ function openPalpite(row){
   renderReceipt(row.picks||{}, 'modalReceipt');
   document.getElementById('modal').classList.add('show');
 }
-function escapeHtml(s){ return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------- Estatísticas ---------- */
+function currentRound(){
+  for(const R of ROUNDS){ const ids=ORDER.filter(id=>MATCHES[id].round===R.r); if(ids.some(id=>!results[id])) return R.r; }
+  return 5;
+}
+async function loadStats(){
+  document.getElementById('statsWrap').innerHTML='<div class="empty-state">Carregando…</div>';
+  await Promise.all([loadPreds(), loadResults()]);
+  statsRound = currentRound();
+  drawStats();
+}
+function drawStats(){
+  const wrap=document.getElementById('statsWrap');
+  const preds=allPreds, nPart=preds.length, cur=currentRound();
+  // overview
+  const champCounts={}; preds.forEach(p=>{const c=(p.picks||{})['r5_1']; if(c) champCounts[c]=(champCounts[c]||0)+1;});
+  const champTop=Object.keys(champCounts).sort((a,b)=>champCounts[b]-champCounts[a])[0];
+  const decTotal=ORDER.filter(id=>results[id]).length;
+  let html=`<div class="statover">👥 <b>${nPart}</b> participantes · ✅ <b>${decTotal}</b>/${ORDER.length} jogos decididos`+
+    (champTop?` · 🏆 campeão mais palpitado: ${flagsm(champTop)}<b>${champTop}</b> (${champCounts[champTop]} de ${nPart})`:'')+`</div>`;
+  // phase selector
+  html+='<div class="phasesel">'+ROUNDS.map(R=>`<button class="phbtn${R.r===statsRound?' on':''}${R.r===cur?' now':''}" data-r="${R.r}">${R.name.replace(' de final','')}${R.r===cur?' • agora':''}</button>`).join('')+'</div>';
+  const R=ROUNDS.find(x=>x.r===statsRound);
+  const ids=ORDER.filter(id=>MATCHES[id].round===statsRound);
+  const decF=ids.filter(id=>results[id]).length;
+  html+=`<div class="statover"><b>${R.name}</b> · cada acerto vale <b>${R.pts} pt${R.pts>1?'s':''}</b> · ${ids.length} jogos · até <b>${R.pts*ids.length} pts</b> por pessoa nesta fase · ${decF}/${ids.length} decididos</div>`;
+  ids.forEach((id,gi)=>{
+    const m=MATCHES[id];
+    const offA=resolve(m.a,results), offB=resolve(m.b,results), off=results[id];
+    const counts={}, voters={};
+    preds.forEach(p=>{ const pk=(p.picks||{})[id]; if(pk){ counts[pk]=(counts[pk]||0)+1; (voters[pk]=voters[pk]||[]).push(p.name); } });
+    const teams=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+    const totalVotes=teams.reduce((s,t)=>s+counts[t],0);
+    const label=(offA&&offB)?`${flagsm(offA)}${offA} <span class="vs">x</span> ${flagsm(offB)}${offB}`:`Jogo ${gi+1} <span class="vs">(adversários a definir)</span>`;
+    html+=`<div class="gcard"><div class="ghead"><span>${label}</span><span class="gpts">${R.pts} pt${R.pts>1?'s':''}</span></div>`;
+    if(off) html+=`<div class="gres">✅ Classificou: ${flagsm(off)}<b>${off}</b> ${T[off]?T[off].n:''}</div>`;
+    if(!totalVotes){ html+='<div class="gnone">ninguém palpitou este jogo</div>'; }
+    else{
+      teams.forEach(tm=>{ const c=counts[tm], pct=Math.round(c*100/nPart);
+        html+=`<div class="bar${off&&tm===off?' barhit':''}"><div class="barlbl">${flagsm(tm)}${tm}</div><div class="bartrack"><div class="barfill" style="width:${Math.max(pct,3)}%"></div></div><div class="barn">${c} <span>(${pct}%)</span></div></div>`;
+      });
+      html+=`<details class="voters"><summary>quem apostou em quem</summary><div class="vlist">`+
+        teams.map(tm=>`<div class="vrow"><span class="vt">${flagsm(tm)}${tm}</span><span class="vn">${voters[tm].map(escapeHtml).join(', ')}</span></div>`).join('')+
+        `</div></details>`;
+    }
+    html+='</div>';
+  });
+  wrap.innerHTML=html;
+  wrap.querySelectorAll('.phbtn').forEach(b=>{ b.onclick=()=>{ statsRound=+b.dataset.r; drawStats(); }; });
+}
+
+/* ---------- Resultados oficiais (compartilhados) ---------- */
+async function renderResultados(){
+  await loadResults();
+  renderBracket('bracket-resultados', results, {editable:true, clearable:true, results, onpick:()=>{
+    clearTimeout(saveTimer); saveTimer=setTimeout(saveResults,400);
+  }});
+}
+async function saveResults(){
+  const {error}=await db.from('bolao_results').update({results, updated_at:new Date().toISOString()}).eq('id',1);
+  if(error) toast('Erro ao salvar resultado',true); else toast('Resultado salvo ✅ (vale pros 2 bolões)');
+}
 
 /* ---------- Navegação ---------- */
 document.querySelectorAll('nav button').forEach(b=>{
@@ -453,17 +470,19 @@ document.querySelectorAll('nav button').forEach(b=>{
     const tab=b.dataset.tab;
     document.getElementById('panel-'+tab).classList.add('active');
     if(tab==='ranking') loadRanking();
+    if(tab==='estatisticas') loadStats();
     if(tab==='resultados') renderResultados();
   };
 });
 document.getElementById('refreshRank').onclick=loadRanking;
+document.getElementById('refreshStats').onclick=loadStats;
 const modalEl=document.getElementById('modal');
 function closeModal(){ modalEl.classList.remove('show'); }
 document.getElementById('modalClose').onclick=closeModal;
 modalEl.onclick=e=>{ if(e.target===modalEl) closeModal(); };
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 
-/* ---------- Init ---------- */
+/* ---------- Legenda de pontos (aba resultados) ---------- */
 function buildLegend(){
   return ROUNDS.map(R=>{
     const champ=R.r===5;
@@ -472,13 +491,10 @@ function buildLegend(){
 }
 document.querySelectorAll('.ptlegend').forEach(el=>el.innerHTML=buildLegend());
 
+/* ---------- Init ---------- */
 (async()=>{
-  try{ const dr=JSON.parse(localStorage.getItem(('bolao_draft_'+POOL))||'{}'); if(dr&&typeof dr==='object') myPicks=dr; }catch(e){}
-  normalize(myPicks);
-  renderBracket('bracket-palpite', myPicks, {editable:true, clearable:true, results, onpick:refreshReceipt});
-  setInterval(fmtRemain,1000);
-  await loadState();
-  renderBracket('bracket-palpite', myPicks, {editable:!isLocked, clearable:true, results, onpick:refreshReceipt});
+  await loadResults();
+  loadRanking();
 })();
 </script>
 </body>
